@@ -10,7 +10,7 @@ module.exports = {
     },
     devServer: {
         contentBase: path.join(__dirname, 'dist'),
-        open: true // 自定打开浏览器
+        open: false // 自动打开浏览器
     },
     resolve: {
         extensions: ['.ts', '.js', '.json']
@@ -19,7 +19,24 @@ module.exports = {
         rules: [
             {
                 test: /\.css$/,
-                use: ['style-loader', 'css-loader']
+                use: ['style-loader', 'css-loader'],
+                exclude: [
+                    path.resolve(__dirname, 'src/components')
+                ]
+            },
+            {
+                test: /\.css$/,
+                use: ['style-loader', {
+                    loader: 'css-loader',
+                    options: {
+                        modules: {  
+                            localIdentName: '[name]__[local]--[hash:base64:5]'
+                        }
+                    }
+                }],
+                include: [
+                    path.resolve(__dirname, 'src/components')
+                ]
             },
             {
                 test: /\.(eot|svg|ttf|woff|woff2)$/,

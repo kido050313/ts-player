@@ -79,12 +79,18 @@ class Video implements Icomponent {
         }
     }
     handle() {
-        const videoContent = this.tempContainer.querySelector(`.${styles['video-content']}`);
-        const videoControls= this.tempContainer.querySelector(`.${styles['video-controls']}`);
-        const videoPlay = this.tempContainer.querySelector(`.${styles['video-play']} i`);
-        const videoTimes = this.tempContainer.querySelectorAll(`.${styles['video-time']} span`);
+        const videoContent: HTMLVideoElement = this.tempContainer.querySelector(`.${styles['video-content']}`);
+        const videoPlay: HTMLElement = this.tempContainer.querySelector(`.${styles['video-play']} i`);
+        const videoTimes: HTMLElement = this.tempContainer.querySelectorAll(`.${styles['video-time']} span`);
+        const videoFull: HTMLElement = this.tempContainer.querySelector(`.${styles['video-full']}`);
+        const videoProgress: HTMLElement = this.tempContainer.querySelectorAll(`.${styles['video-progress']} div`);
+        const videoVolProgress: HTMLElement = this.tempContainer.querySelectorAll(`.${styles['video-volprogress']} div`);
+        const videoVolum = this.tempContainer.querySelector(`.${styles['video-volume']} i`);
 
         let timer;
+        videoContent.volume = 0.5;
+        let currentVolum = 0.5;
+        let flag = false; // 点击音量icon的标记
 
         // 是否加载完毕
         videoContent.addEventListener('canplay', () => {
@@ -103,6 +109,88 @@ class Video implements Icomponent {
             videoPlay.className = 'iconfont icon-bofang';
             clearInterval(timer);
         })
+        // 全屏
+        videoFull.addEventListener('click', () => {
+            videoContent.requestFullscreen();
+        })
+
+        // 进度拖拽
+        videoProgress[2].addEventListener('mousedown', function(e: MouseEvent) {
+            let downx = e.pageX; // 按下的坐标
+            let downL = this.offsetLeft; // 按下的距离
+            let barWidthHalf = this.offsetWidth / 2; 
+            document.onmousemove = (e: MouseEvent) => {
+                // 计算比例    
+                let scale = (e.pageX - downx + downL + barWidthHalf) / this.parentNode.offsetWidth;
+                if(scale < 0 ) {
+                    scale = 0;
+                } else if (scale > 1) {
+                    scale = 1;
+                }
+                videoProgress[0].style.width = scale * 100 + '%';
+                videoProgress[1].style.width = scale * 100 + '%';
+                this.style.left = scale * 100 + '%';
+                videoContent.currentTime = scale * videoContent.duration;
+            };
+            // 鼠标离开时停下,取消事件
+            document.onmouseup = () => {
+                document.onmousemove = document.onmouseup = null;
+            }
+            e.preventDefault();
+        })
+
+        // 音量拖拽
+        videoVolProgress[1].addEventListener('mousedown', function(e: MouseEvent) {
+            let downx = e.pageX; // 按下的坐标
+            let downL = this.offsetLeft; // 按下的距离
+            let barWidthHalf = this.offsetWidth / 2; 
+            document.onmousemove = (e: MouseEvent) => {
+                // 计算比例    
+                let scale = (e.pageX - downx + downL + barWidthHalf) / this.parentNode.offsetWidth;
+                if(scale < 0 ) {
+                    scale = 0;
+                } else if (scale > 1) {
+                    scale = 1;
+                }
+                videoVolProgress[0].style.width = scale * 100 + '%';
+                this.style.left = scale * 100 + '%';
+                videoContent.volume = scale;
+                // 音量被改变了,重置标记
+                flag = false;
+                // 静音
+                if(scale === 0) {
+                    videoVolum.className = 'iconfont icon-52jingyin';
+                } else {
+                    videoVolum.className = 'iconfont icon-yinliang';
+                }
+            };
+            // 鼠标离开时停下,取消事件
+            document.onmouseup = () => {
+                document.onmousemove = document.onmouseup = null;
+            }
+            e.preventDefault();
+        });
+
+        videoVolum.addEventListener('click', () => {
+            // 记录未改变过音量时的第一次点击的音量
+            if( flag === false ) {
+                currentVolum = videoContent.volume;
+            }
+            flag = true;
+            if(videoContent.volume !== 0 ) {
+                videoContent.volume = 0;
+            } else {
+                videoContent.volume = currentVolum;
+            }
+            videoVolProgress[0].style.width = videoContent.volume * 100 + '%';
+            videoVolProgress[1].style.left = videoContent.volume * 100 + '%';
+            // 静音
+            if(videoContent.volume === 0) {
+                videoVolum.className = 'iconfont icon-52jingyin';
+            } else {
+                videoVolum.className = 'iconfont icon-yinliang';
+            }
+        })
 
         videoPlay.addEventListener('click', () => {
             if (videoContent.paused) {
@@ -110,11 +198,16 @@ class Video implements Icomponent {
             } else {
                 videoContent.pause();
             }
-        })
+        }) 
 
         // 正在播放中
         function playing() {
+            let scale = videoContent.currentTime / videoContent.duration;
+            let scaleSuc = videoContent.buffered.end(0) / videoContent.duration;
             videoTimes[0].innerText = formatTime(videoContent.currentTime);
+            videoProgress[0].style.width = scale * 100 + '%';
+            videoProgress[1].style.width = scaleSuc * 100 + '%';
+            videoProgress[2].style.left = scale * 100 + '%';
         }
 
         // 秒转时分

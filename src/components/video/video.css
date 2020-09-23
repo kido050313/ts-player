@@ -22,20 +22,20 @@
     position: absolute;
     left: 0;
     z-index: 1;
-    width: 50%;
+    width: 0;
     height: 100%;
     background-color: #ff6a03;
 }
 .video-progress-suc {
     position: absolute;
     left: 0;
-    width: 70%;
+    width: 0;
     height: 100%;
     background-color: #666;
 }
 .video-progress-bar {
     position: absolute;
-    left: 0;
+    left: 7px;
     top: 0;
     z-index: 2;
     margin-left: -7px;
@@ -44,6 +44,7 @@
     height: 14px;
     background-color: white;
     border-radius: 50%;
+    cursor: pointer;
 }
 .video-play {
     float: left;
@@ -70,6 +71,7 @@
     height: 45px;
     line-height: 45px;
     margin-right: 20px;
+    cursor: pointer;
     
 }
 .video-full i {
@@ -78,14 +80,16 @@
 }
 .video-volume {
     float: right;
+    margin-right: 20px;
     height: 50px;
     display: flex;
     align-items: center;
 }
 .video-volume i {
-    margin-right: 20px;
+    margin-right: 10px;
     font-size: 20px;
     color: white;
+    cursor: pointer;
 }
 /* 百分比会更好 */
 .video-volprogress {
@@ -102,7 +106,7 @@
 }
 .video-volprogress-bar {
     position: absolute;
-    left: 0;
+    left: 50%;
     top: 0;
     z-index: 2;
     margin-left: -7px;
@@ -111,4 +115,5 @@
     height: 14px;
     background-color: white;
     border-radius: 50%;
+    cursor: pointer;
 }

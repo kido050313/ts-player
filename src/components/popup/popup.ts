@@ -98,7 +98,8 @@ class Popup implements Icomponent {
         this.mask.className = styles.mask;
         this.mask.style.width = '100%';
         console.log(document.body.offsetHeight)
-        this.mask.style.height = document.body.offsetHeight + 'px';
+        this.mask.style.height = '100%';
+        // this.mask.style.height = document.body.offsetHeight + 'px';
         document.body.appendChild(this.mask)
     }
     contentCallback () {

@@ -1,6 +1,7 @@
 import App from './app';
 import './app.css';
 import popup from './components/popup/popup';
+import video from './components/video/video';
 
 let list = document.querySelectorAll('#list li');
 
@@ -16,7 +17,11 @@ for(let i = 0; i < list.length; i++) {
             mask: true,
             closeMask: false,
             content(elem) {
-                console.log(elem)
+                // console.log(elem)
+                video({
+                    url,
+                    elem,
+                })
             }
         });
     })

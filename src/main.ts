@@ -17,10 +17,11 @@ for(let i = 0; i < list.length; i++) {
             mask: true,
             closeMask: false,
             content(elem) {
-                // console.log(elem)
+                console.log(elem)
                 video({
                     url,
                     elem,
+                    autoplay: true
                 })
             }
         });

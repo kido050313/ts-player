@@ -10,13 +10,16 @@
 .video-controls {
     width: 100%;
     position: absolute;
-    bottom: 0;
+    bottom: -80px;
     left: 0;
+    /* opacity: 0; */
+    transition: .5s;
 }
 .video-progress {
     position: relative;
     height: 5px;
     background-color: #222333;
+    cursor: pointer;
 }
 .video-progress-now {
     position: absolute;
@@ -98,6 +101,7 @@
     width: 100px; 
     height: 5px;
     background-color: #222333;
+    cursor: pointer;
 }
 .video-volprogress-now {
     width: 50%;

@@ -37,7 +37,7 @@ class Video implements Icomponent {
     }
     template() {
         this.tempContainer = document.createElement('div');
-        this.tempContainer.style.className = styles.video;
+        this.tempContainer.className = styles.video;
         this.tempContainer.style.width = this.settings.width;
         this.tempContainer.style.height = this.settings.height;
         this.tempContainer.innerHTML = `
@@ -80,6 +80,7 @@ class Video implements Icomponent {
     }
     handle() {
         const videoContent: HTMLVideoElement = this.tempContainer.querySelector(`.${styles['video-content']}`);
+        const videoControl: HTMLVideoElement = this.tempContainer.querySelector(`.${styles['video-controls']}`);
         const videoPlay: HTMLElement = this.tempContainer.querySelector(`.${styles['video-play']} i`);
         const videoTimes: HTMLElement = this.tempContainer.querySelectorAll(`.${styles['video-time']} span`);
         const videoFull: HTMLElement = this.tempContainer.querySelector(`.${styles['video-full']}`);
@@ -91,6 +92,31 @@ class Video implements Icomponent {
         videoContent.volume = 0.5;
         let currentVolum = 0.5;
         let flag = false; // 点击音量icon的标记
+
+        // 是否自动播放
+        if (this.settings.autoplay) {
+            timer = setInterval(playing, 1000);
+            videoContent.play();
+        }
+
+        // 点击视频可播放暂停
+        videoContent.addEventListener('click', function (){
+            if (this.paused) {
+                this.play();
+            } else {
+                this.pause();
+            }
+        })
+
+        // 控制条显示隐藏
+        this.tempContainer.addEventListener('mouseenter', () => {
+            videoControl.style.bottom = '0';
+            // videoControl.style.opacity = '1';
+        });
+        this.tempContainer.addEventListener('mouseleave', () => {
+            videoControl.style.bottom = '-80px';
+            // videoControl.style.opacity = '0';
+        })
 
         // 是否加载完毕
         videoContent.addEventListener('canplay', () => {
@@ -113,6 +139,23 @@ class Video implements Icomponent {
         videoFull.addEventListener('click', () => {
             videoContent.requestFullscreen();
         })
+
+        // 进度点击
+        videoProgress[0].parentNode.addEventListener('click', function(e: MouseEvent) {
+            let downX = e.pageX; // 按下的坐标
+            let leftX = this.getBoundingClientRect().left ;// 进度条距离左边屏幕的距离
+            let scale = (downX - leftX) / this.offsetWidth;
+            if(scale < 0 ) {
+                scale = 0;
+            } else if (scale > 1) {
+                scale = 1;
+            }
+            videoProgress[0].style.width = scale * 100 + '%';
+            videoProgress[1].style.width = scale * 100 + '%';
+            videoProgress[2].style.left = scale * 100 + '%';
+            videoContent.currentTime = scale * videoContent.duration;
+            videoContent.play();
+        }) 
 
         // 进度拖拽
         videoProgress[2].addEventListener('mousedown', function(e: MouseEvent) {
@@ -137,6 +180,30 @@ class Video implements Icomponent {
                 document.onmousemove = document.onmouseup = null;
             }
             e.preventDefault();
+        })
+
+        console.log(videoVolProgress[0].parentNode)
+        // 音量点击
+        videoVolProgress[0].parentNode.addEventListener('click', function(e: MouseEvent) {
+            let downx = e.pageX; // 按下的坐标
+            let leftX = this.getBoundingClientRect().left;
+            let scale = (downx - leftX ) / this.offsetWidth;
+            if(scale < 0 ) {
+                scale = 0;
+            } else if (scale > 1) {
+                scale = 1;
+            }
+            videoVolProgress[0].style.width = scale * 100 + '%';
+            videoVolProgress[1].style.left = scale * 100 + '%';
+            videoContent.volume = scale;
+            // 音量被改变了,重置标记
+            flag = false;
+            // 静音
+            if(scale === 0) {
+                videoVolum.className = 'iconfont icon-52jingyin';
+            } else {
+                videoVolum.className = 'iconfont icon-yinliang';
+            }
         })
 
         // 音量拖拽
